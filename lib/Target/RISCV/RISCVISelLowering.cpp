@@ -1047,6 +1047,11 @@ RISCVTargetLowering::LowerCall(CallLoweringInfo &CLI,
     Ops.push_back(DAG.getRegister(RegsToPass[I].first,
                                   RegsToPass[I].second.getValueType()));
 
+  const RISCVRegisterInfo *TRI = Subtarget.getRegisterInfo();
+  const uint32_t *Mask = TRI->getCallPreservedMask(MF, CallConv);
+  assert(Mask && "Missing call preserved mask for calling convention");
+  Ops.push_back(DAG.getRegisterMask(Mask));
+
   // Glue the call to the argument copies, if any.
   if (Glue.getNode())
     Ops.push_back(Glue);
